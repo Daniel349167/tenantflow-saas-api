@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: tenantflow-saas-api
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/tenantflow}
+    username: ${DB_USERNAME:tenantflow}
+    password: ${DB_PASSWORD:tenantflow}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${OAUTH_ISSUER_URI:http://localhost:8081/realms/tenantflow}
+          jwk-set-uri: ${OAUTH_JWK_SET_URI:http://localhost:8081/realms/tenantflow/protocol/openid-connect/certs}
+
+server:
+  port: 8080
+  shutdown: graceful
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs

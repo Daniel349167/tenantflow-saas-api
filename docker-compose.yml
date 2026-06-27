@@ -1,0 +1,45 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: tenantflow
+      POSTGRES_USER: tenantflow
+      POSTGRES_PASSWORD: tenantflow
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tenantflow"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.6.3
+    command: start-dev --import-realm
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HEALTH_ENABLED: "true"
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./infra/keycloak/tenantflow-realm.json:/opt/keycloak/data/import/tenantflow-realm.json:ro
+
+  api:
+    build: .
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/tenantflow
+      DB_USERNAME: tenantflow
+      DB_PASSWORD: tenantflow
+      OAUTH_ISSUER_URI: http://localhost:8081/realms/tenantflow
+      OAUTH_JWK_SET_URI: http://keycloak:8080/realms/tenantflow/protocol/openid-connect/certs
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+
+volumes:
+  postgres-data:
