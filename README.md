@@ -1,5 +1,7 @@
 # TenantFlow
 
+[![CI](https://github.com/Daniel349167/tenantflow-saas-api/actions/workflows/ci.yml/badge.svg)](https://github.com/Daniel349167/tenantflow-saas-api/actions/workflows/ci.yml)
+
 Secure multi-tenant work-order API built with Java 17, Spring Boot, PostgreSQL,
 Keycloak and hexagonal architecture.
 
